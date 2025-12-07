@@ -22,7 +22,11 @@ It aims to provide a simple interface for scanning, parsing measurement data, an
 - Enable DMA for TX
 - Ensure global and DMA interrup are enabled
 
-3. **Initialization Example**
+3. **Import Driver**
+- Copy `Core/Src/rplidar.c` into your project source directory
+- Copy `Core/Inc/rplidar.h` into your project header directory
+
+4. **Initialization Example**
 
 ```
 UART_HandleTypeDef huart1;

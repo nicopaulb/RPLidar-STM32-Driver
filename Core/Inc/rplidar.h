@@ -12,47 +12,53 @@
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
 
-typedef struct __attribute__((packed)) {
-	uint8_t model_sub :4;
-	uint8_t model_major :4;
-	uint8_t fw_minor;
-	uint8_t fw_major;
-	uint8_t hardware;
-	uint8_t serial_nb[16];
+typedef struct __attribute__((packed))
+{
+    uint8_t model_sub :4;
+    uint8_t model_major :4;
+    uint8_t fw_minor;
+    uint8_t fw_major;
+    uint8_t hardware;
+    uint8_t serial_nb[16];
 } rplidar_info_t;
 
-typedef struct __attribute__((packed)) {
-	uint8_t status;
-	uint16_t error_code;
+typedef struct __attribute__((packed))
+{
+    uint8_t status;
+    uint16_t error_code;
 } rplidar_health_t;
 
-typedef struct __attribute__((packed)) {
-	uint16_t tstandart;
-	uint16_t texpress;
+typedef struct __attribute__((packed))
+{
+    uint16_t tstandart;
+    uint16_t texpress;
 } rplidar_samplerate_t;
 
-typedef struct __attribute__((packed)) {
-	uint32_t type;
-	uint8_t payload_size;
-	uint8_t *payload;
+typedef struct __attribute__((packed))
+{
+    uint32_t type;
+    uint8_t payload_size;
+    uint8_t *payload;
 } rplidar_configuration_t;
 
-typedef struct __attribute__((packed)) {
-	uint8_t start :2;
-	uint8_t quality :6;
-	uint16_t check :1;
-	uint16_t angle :15;
-	uint16_t distance;
+typedef struct __attribute__((packed))
+{
+    uint8_t start :2;
+    uint8_t quality :6;
+    uint16_t check :1;
+    uint16_t angle :15;
+    uint16_t distance;
 } rplidar_measurement_t;
 
-typedef struct __attribute__((packed)) {
-	uint8_t checksum1 :4;
-	uint8_t sync1 :4;
-	uint8_t checksum2 :4;
-	uint8_t sync2 :4;
-	uint16_t angle :15;
-	uint16_t start :1;
-	uint16_t distance[40];
+typedef struct __attribute__((packed))
+{
+    uint8_t checksum1 :4;
+    uint8_t sync1 :4;
+    uint8_t checksum2 :4;
+    uint8_t sync2 :4;
+    uint16_t angle :15;
+    uint16_t start :1;
+    uint16_t distance[40];
 } rplidar_dense_measurements_t;
 
 /**
@@ -60,8 +66,8 @@ typedef struct __attribute__((packed)) {
  * @param huart Pointer to the UART handle.
  * @return True if initialization is successful, false otherwise.
  *
- * This function sets up the necessary buffers and DMA configurations for communication with the RPLIDAR.
- * Wait at least 500ms before sending another request.
+ * This function sets up the necessary UART configurations for communication with the RPLIDAR and check its health status.
+ * If needed, it resets the RPLIDAR and can takes up to 1000 ms before returning.
  */
 bool RPLIDAR_Init(UART_HandleTypeDef *huart);
 
@@ -78,8 +84,7 @@ bool RPLIDAR_Init(UART_HandleTypeDef *huart);
  * If a NULL pointer is provided, the function will return immediately and the `RPLIDAR_OnSingleMeasurement`
  * callback will be called for each new measurement.
  */
-bool RPLIDAR_StartScan(rplidar_measurement_t measurement[], uint32_t count,
-		uint32_t timeout);
+bool RPLIDAR_StartScan(rplidar_measurement_t measurement[], uint32_t count, uint32_t timeout);
 
 /**
  * @brief Start express scanning in blocking or non-blocking mode.
@@ -94,8 +99,7 @@ bool RPLIDAR_StartScan(rplidar_measurement_t measurement[], uint32_t count,
  * If a NULL pointer is provided, the function will return immediately and the `RPLIDAR_OnDenseMeasurements`
  * callback will be called for each new measurement.
  */
-bool RPLIDAR_StartScanExpress(rplidar_dense_measurements_t *measurements,
-		uint32_t count, uint32_t timeout);
+bool RPLIDAR_StartScanExpress(rplidar_dense_measurements_t *measurements, uint32_t count, uint32_t timeout);
 
 /**
  * @brief Stop scanning.
@@ -162,8 +166,7 @@ bool RPLIDAR_RequestDeviceInfo(rplidar_info_t *info, uint32_t timeout);
  * If a NULL pointer is provided, the function will return immediately and the `RPLIDAR_OnSampleRate`
  * callback will be called with the response.
  */
-bool RPLIDAR_RequestSampleRate(rplidar_samplerate_t *samplerate,
-		uint32_t timeout);
+bool RPLIDAR_RequestSampleRate(rplidar_samplerate_t *samplerate, uint32_t timeout);
 
 /**
  * @brief Request configuration in blocking or non-blocking mode.
@@ -180,9 +183,8 @@ bool RPLIDAR_RequestSampleRate(rplidar_samplerate_t *samplerate,
  * If a NULL pointer is provided, the function will return immediately and the `RPLIDAR_OnConfiguration`
  * callback will be called with the response.
  */
-bool RPLIDAR_RequestConfiguration(uint32_t type, uint8_t *payload,
-		uint16_t payload_size, rplidar_configuration_t *config,
-		uint32_t timeout);
+bool RPLIDAR_RequestConfiguration(uint32_t type, uint8_t *payload, uint16_t payload_size,
+                                  rplidar_configuration_t *config, uint32_t timeout);
 
 void RPLIDAR_OnSingleMeasurement(rplidar_measurement_t *measurement);
 void RPLIDAR_OnDenseMeasurements(rplidar_dense_measurements_t *measurement);

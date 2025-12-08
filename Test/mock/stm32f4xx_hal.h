@@ -2,6 +2,7 @@
 #define __STM32F4XX_HAL_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef enum
 {

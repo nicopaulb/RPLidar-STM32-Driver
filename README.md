@@ -60,6 +60,8 @@ This example shows how to:
   - Start a scanning session
   - Parse and print distance + angle samples received from the RPLIDAR
 
+ST-LINK debug interface (SWD) is used for printf() output.
+
 ## Testing
 
 This driver has been successfully tested with:

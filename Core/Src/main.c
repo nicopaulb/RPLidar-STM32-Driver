@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <string.h>
 #include "rplidar.h"
 /* USER CODE END Includes */
 
@@ -46,7 +47,8 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
-
+static rplidar_measurement_t sample;
+static bool sample_ready = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,7 +62,14 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void RPLIDAR_OnSingleMeasurement(rplidar_measurement_t *measurement)
+{
+    if (!sample_ready)
+    {
+        memcpy(&sample, measurement, sizeof(rplidar_measurement_t));
+        sample_ready = true;
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -95,12 +104,9 @@ int main(void)
     MX_DMA_Init();
     MX_USART1_UART_Init();
     /* USER CODE BEGIN 2 */
-
-    HAL_Delay(2000);
     RPLIDAR_Init(&huart1);
 
     rplidar_health_t health;
-
     printf("Sending Health Request... ");
     if (RPLIDAR_RequestHealth(&health, 5000))
     {
@@ -113,19 +119,7 @@ int main(void)
         printf("NOK\n");
     }
 
-    rplidar_info_t info;
-//	RPLIDAR_RequestDeviceInfo(&info, 5000);
-//	snprintf(str, sizeof(str), "INFO");
-//	ILI9488_WString(70, 40, str, Font24, 1, RED, BLACK);
-//	snprintf(str, sizeof(str), "Model : %hu.%hu", info.model_major,
-//			info.model_sub);
-//	ILI9488_WString(20, 70, str, Font20, 1, WHITE, BLACK);
-//	snprintf(str, sizeof(str), "FW :    %hu.%hu", info.fw_major, info.fw_minor);
-//	ILI9488_WString(20, 90, str, Font20, 1, WHITE, BLACK);
-//	snprintf(str, sizeof(str), "HW :    %hu", info.hardware);
-//	ILI9488_WString(20, 110, str, Font20, 1, WHITE, BLACK);
-//	rplidar_samplerate_t s_samplerate;
-//	RPLIDAR_RequestSampleRate(&s_samplerate, 5000);
+    RPLIDAR_StartScan(NULL, 0, 0);
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -133,6 +127,13 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
+        if(sample_ready) {
+            printf("Sample Received :\n");
+            printf("    - Angle : %f\n", sample.angle / 64.0);
+            printf("    - Distance : %f\n", sample.distance / 4.0);
+            printf("    - Quality : %u\n", sample.quality);
+            sample_ready = false;
+        }
         /* USER CODE BEGIN 3 */
     }
     /* USER CODE END 3 */
